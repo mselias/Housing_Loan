@@ -1,5 +1,5 @@
 # Home Loan
-This is a git repository for the Kaggle Home Loan Challenge and will be made public. This is a work in progress and updates to this git repository will be made regularly. The current complete procedures are as follows:
+This is a git repository for the Kaggle Home Loan Challenge and will be made public. This is a work in progress and updates to this git repository will be made regularly. The current completed procedures are as follows:
 
 1) Data loading onto a MySQL Database from Python
 2) Beginning stages of Data Processing
