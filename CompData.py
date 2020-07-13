@@ -9,6 +9,7 @@ import pymysql
 # Data Manipulator
 import pandas as pd
 import numpy as np
+import random
 
 pd.set_option('display.max_columns', None)
 
@@ -240,7 +241,7 @@ def colextract(Data):
     return Columns.replace("'", "")
 
 # Extracts only the important columns that we need for querying
-def get_core_columns(Col_List, Table):
+def get_core_columns(Col_List, *argv):
     
     '''
     Function:
@@ -262,8 +263,10 @@ def get_core_columns(Col_List, Table):
     to execute.
     
     '''
-    
-    Table_Columns = Col_List[Table]
+    if len(argv) > 0:
+        Table_Columns = Col_List[argv[0]]
+    else:
+        Table_Columns = Col_List
     
     # Trimming Base Table by the following column names
     App_Train_Trim = [i for i in Table_Columns if '_MODE' not in i]
@@ -438,5 +441,55 @@ def get_missing_partition(Data):
           .format(len(Missing_Floats), len(Missing_Objects), len(Missing_Integers)))
 
     return Missing_Floats, Missing_Objects, Missing_Integers
+
+def fill_missing(data, column_of_interest):
+    
+    '''
+    Function:
+    ---------
+    
+    Takes in two parameters, the Pandas DataFrame and the Column that we are
+    trying to correct in a string format.
+    
+    
+    Future Functionality:
+    ---------------------
+    
+    None at the present moment, but as we proceed we will think of new things
+    to implement.
+    
+    
+    Description:
+    ------------
+    
+    This will return a list of values that will be used to fill in the missing
+    terms in the Pandas DataFrame. The idea is pretty simple, sample from the
+    DataFrame where the values are not missing, then take those values and shift
+    it by a same factor and randomly subtract or add this term to the sampled
+    point. This will generate a new point and maintain the distribution shape.
+    
+    '''
+    
+    Sample = random.choices(list(data.loc[data[column_of_interest].isnull() == False, 
+                                          column_of_interest]),
+                            k = data[column_of_interest].isnull().sum())
+    
+    Sign = random.choices([-2, -1, 1, 2], k = data[column_of_interest].isnull().sum())
+    
+    def osicallation(point, sign, random_osicallation_point):
+        return (point + sign * random_osicallation_point)
+    
+    Sample_Oscilated = []
+    
+    for i, j in zip(Sample, Sign):
+        
+        osicallation_point = random.random()
+        
+        if osicallation(i, j, osicallation_point) > 0:
+            Sample_Oscilated.append(osicallation(i, j, osicallation_point))
+        else:
+            Sample_Oscilated.append(0)
+    
+    return Sample_Oscilated
 
 ###################################################################################################################
